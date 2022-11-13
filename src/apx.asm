@@ -26,6 +26,7 @@ VDSLSTH =	$0201
 GRACTL	=	$D01D
 PMBASE  =	$D407
 WSYNC	=	$D40A
+VCOUNT  =       $D40B
 NMIEN	=	$D40E
 	
 	ORG	$3400
@@ -106,9 +107,9 @@ PMG:				; P/M Data
 	
 	;; Display List
 	
-DLST:	.BYTE	$70,$70,$70,$70,$70,$70,$70
-	.BYTE	$C7,.LO(SCR),.HI(SCR)
-	.BYTE	$87,$87,$87,$87
+DLST:	.BYTE	$F0,$70,$70,$70,$70,$70,$70
+	.BYTE	$47,.LO(SCR),.HI(SCR)
+	.BYTE	$07,$07,$07,$07
 	.BYTE	$41,.LO(DLST),.HI(DLST)
 
 	;; Screen Data
@@ -119,6 +120,54 @@ SCR:
 	.BYTE $26,$04,$04,$04,$04,$04,$1e,$04,$27,$28,$29,$2a,$2b,$2c,$2d,$2e,$bc,$fc,$7c,$00
 	.BYTE $2f,$30,$31,$32,$33,$04,$1e,$04,$34,$00,$35,$36,$37,$38,$39,$3a,$bd,$fd,$7d,$00
 
+DLI:	PHA
+L0:	STA WSYNC
+	LDA #$AC
+	STA $D000
+	LDA VCOUNT
+	AND #$07
+	BEQ L2
+L1:     NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP	
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	JMP LC
+L2:	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+LC:	LDA #$C8
+	STA $D000
+	LDA VCOUNT
+	CMP #80
+	BNE L0
+	PLA
+	RTI
+	
 START:
 	;; CLEAR KEYBOARD BUFFER
 	LDA	#$FF
@@ -188,10 +237,10 @@ SL1:	LDA	$02C4,X
 	LDA	#$C4
 	STA	$D003
 
-	LDA	#$CD
-	STA	$D004
-	LDA	#$CE
-	STA	$D005
+	;; LDA	#$CD
+	;; STA	$D004
+	;; LDA	#$CE
+	;; STA	$D005
 	
 	;; SET DISPLAY LIST
 
@@ -208,60 +257,17 @@ SL1:	LDA	$02C4,X
 	LDA	#.HI(FONT)
 	STA	CHBAS
 
-	;; ;; DLI NMI enable
-	;; LDA	#.lo(DLI)
-	;; STA	VDSLSTL
-	;; LDA	#.hi(DLI)
-	;; STA	VDSLSTH
-	;; LDA	#$C0
-	;; STA	NMIEN
+	;; DLI NMI enable
+	LDA	#.lo(DLI)
+	STA	VDSLSTL
+	LDA	#.hi(DLI)
+	STA	VDSLSTH
+	LDA	#$C0
+	STA	NMIEN
 	
 	;; Main loop
 
-LOOP:	STA 	WSYNC
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	NOP
-	LDA	#$80
-	STA	$D019
-	
-	LDA	#$2A
-	STA	$D019
-	
-	JMP	LOOP
+LOOP:	JMP	LOOP
 
 	;; RESTORE DISPLAY LIST
 
