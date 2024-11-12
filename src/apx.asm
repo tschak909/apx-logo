@@ -181,6 +181,7 @@ SCR:
 
 	;; Alternate DLI which flips back to normal charset
 DLI:	PHA
+	PLA
 	STA WSYNC
 	LDA #$E0
 	STA CHBASE
